@@ -17,10 +17,20 @@ module.exports={
                 loader: 'vue-loader'  
             },{
                 test: /\.scss$/,
-                loader: 'sass-loader'
-            }   
+                use:[
+                    'style-loader',
+                    'css-loader',
+                    'sass-loader'
+                ]
+            },      {
+                test: /\.js$/,
+                loader: 'babel-loader'
+              }
         ]
-    },  
+    }, 
+    resolve: {
+        extensions: ['.vue','.js', '.jsx']
+      }, 
     plugins: [
         new VueLoaderPlugin()
     ],
