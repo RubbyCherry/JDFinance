@@ -1,43 +1,80 @@
 const path = require('path');
-const VueLoaderPlugin = require('vue-loader/lib/plugin');
-
-module.exports={
-    mode : 'development',
-    entry : {
-        index : './src/main.js'
+const webpack = require('webpack');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
+const ExtractTextPlugin = require("extract-text-webpack-plugin");
+module.exports = env => {
+  if (!env) {
+    env = {}
+  }
+  let plugins=[
+    new CleanWebpackPlugin(['dist']),
+    new HtmlWebpackPlugin({template: './public/index.html'}),
+    new webpack.NamedModulesPlugin(),
+    new webpack.HotModuleReplacementPlugin()
+  ];
+  if(env.production){
+    plugins.push(
+      new webpack.DefinePlugin({
+        'process.env': {
+          NODE_ENV: '"production"'
+        }
+      }),
+      new ExtractTextPlugin("style.css", {ignoreOrder: true})
+    )
+  }
+  return {
+    entry: {
+      app: './src/main.js'
     },
-    output:{
-        path:path.resolve(__dirname,"./dist"),
-        filename:"bundle.js"
+    devServer: {
+      contentBase: './dist',
+      hot: true,
+      compress: true,
+      port: 9000,
+      clientLogLevel: "none",
+      quiet: true
     },
     module: {
-        rules:[
-            {
-              test: /\.vue$/,
-                loader: 'vue-loader'  
-            },{
-                test: /\.scss$/,
-                use:[
-                    'style-loader',
-                    'css-loader',
-                    'sass-loader'
-                ]
-            },      {
-                test: /\.js$/,
-                loader: 'babel-loader'
-              }
-        ]
-    }, 
+      loaders: [
+        {
+          test: /\.html$/,
+          loader: 'html-loader'
+        }, {
+          test: /\.vue$/,
+          loader: 'vue-loader',
+          options: {
+            cssModules: {
+              localIdentName: '[path][name]---[local]---[hash:base64:5]',
+              camelCase: true
+            },
+            extractCSS: true,
+            loaders: env.production?{
+              css: ExtractTextPlugin.extract({use: 'css-loader!px2rem-loader?remUnit=40&remPrecision=8', fallback: 'vue-style-loader'}),
+              scss: ExtractTextPlugin.extract({use: 'css-loader!px2rem-loader?remUnit=40&remPrecision=8!sass-loader', fallback: 'vue-style-loader'})
+            }:{
+              css: 'vue-style-loader!css-loader!px2rem-loader?remUnit=40&remPrecision=8',
+              scss: 'vue-style-loader!css-loader!px2rem-loader?remUnit=40&remPrecision=8!sass-loader'
+            }
+          }
+        }, {
+          test: /\.scss$/,
+          loader: 'style-loader!css-loader!sass-loader'
+        }
+      ]
+    },
     resolve: {
-        extensions: ['.vue','.js', '.jsx']
-      }, 
-    plugins: [
-        new VueLoaderPlugin()
-    ],
-    devServer: {
-        contentBase: "./public",
-        historyApiFallback: true,
-        inline: true,
-        port: 8080
+      extensions: [
+        '.js', '.vue', '.json'
+      ],
+      alias: {
+        'vue$': 'vue/dist/vue.esm.js'
+      }
+    },
+    plugins,
+    output: {
+      filename: '[name].min.js',
+      path: path.resolve(__dirname, 'dist')
     }
-}
+  }
+};

@@ -3,6 +3,7 @@
         <span :class="$style.left">
             <em>注册</em>&nbsp;|&nbsp;<em>登录</em>
         </span>
+        <img src="//storage.360buyimg.com/base/images/jdjr-logo/logo-jr-r.png"/>
         <Btn :class="$style.btnDownload">APP下载</Btn>
     </div>
 </template>
@@ -27,8 +28,6 @@ export default {
     left: 0;
     right: 0;
     font-size: 32px;
-    background: #fff url() center no-repeat;
-    background-size: auto 50%;
     z-index: 100;
     .left{
         font-size: 28px;

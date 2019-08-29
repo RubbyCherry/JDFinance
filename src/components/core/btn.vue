@@ -1,6 +1,6 @@
 <template>
     <div :class="[btnClass,cname]">
-        <slot/>
+      <slot></slot>
     </div>
 </template>
 
@@ -21,7 +21,7 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 @import "../../assets/element.scss";
 .btn{
     @include btn;
